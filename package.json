@@ -5,7 +5,7 @@
   "author": "Treehouse Island, Inc.",
   "private": true,
   "scripts": {
-    "start": "node ./app"
+    "start": "nodemon ./app"
   },
   "dependencies": {
     "body-parser": "^1.13.3",
