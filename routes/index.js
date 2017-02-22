@@ -7,6 +7,22 @@ router.get('/', function(req, res, next) {
   return res.render('index', { title: 'Home' });
 });
 
+// GET /login
+router.get('/login', function(req, res, next) {
+  return res.render('login', { title: 'Log In' })
+});
+
+// POST /login
+router.post('/login', function(req, res, next) {
+  if (req.body.email && req.body.password) {
+
+  } else {
+    var err = new Error('Email and password required, geez...');
+    err.status = 401;
+    return next(err);
+  }
+});
+
 // GET /about
 router.get('/about', function(req, res, next) {
   return res.render('about', { title: 'About' });

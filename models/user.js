@@ -25,6 +25,31 @@ var UserSchema = new Schema({
   }
 });
 
+//authernticate input against database documents
+//this is a custom method we will call 'authenticate' that takes the user/password and a callback
+// statics objects lets us add that method to the model so we can use it on other pages when we require the model
+//this call back, when we make it, will either log the user in or give an error
+UserSchema.statics.authenticate = function(email, password, callback) {
+  User.findOne({ email: email })
+    .exec(function (err, user) {
+      if (err) {
+        return callback(error);
+      } else if (!user){
+        var err = new Error('User not found');
+        err.status = 401;
+        return callback(error);
+      }
+      bcrypt.compare(password, user.password, function(err, result) {
+        if (result === true) {
+          return callback(null, user);
+        } else {
+          return callback();
+        }
+      });
+    });
+}
+
+
 //hash password BEFORE saving to database
 //this is a mongoose function called a pre-save hook
 //takes two arguments
@@ -32,6 +57,7 @@ var UserSchema = new Schema({
 //second, a callback that can take middleware
 
 UserSchema.pre('save', function(next) {
+  //this keyword refers to the user data that is to be written to mongo
   var user = this;
   //takes three arguments
     //1. the plain text password from user object

@@ -1,7 +1,15 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var session = require('express-session');
+
 var app = express();
+
+app.use(session({
+  secret: 'firefly',
+  resave: true,
+  saveUninitialized: false
+}))
 
 //connect to database with mongoose
 mongoose.connect("mongodb://admin:gB4s55PaXe@ds011912.mlab.com:11912/treehouse-user-auth");
