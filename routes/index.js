@@ -7,6 +7,29 @@ router.get('/', function(req, res, next) {
   return res.render('index', { title: 'Home' });
 });
 
+// GET /profile
+
+router.get('/profile', function(req, res, next) {
+  if (!req.session.userId) {
+    var err = new Error("you are not authorized to view this page");
+    error.status = 403;
+    return next(err);
+  }
+
+  User.findById(req.session.userId)
+    .exec(function(err, user) {
+      if(err) {
+        return next(err);
+      } else {
+        return res.render('profile', {
+          title: 'Profile',
+          name: user.name,
+          favorite: user.favoriteBook
+        })
+      }
+    });
+})
+
 // GET /login
 router.get('/login', function(req, res, next) {
   return res.render('login', { title: 'Log In' })
@@ -15,29 +38,35 @@ router.get('/login', function(req, res, next) {
 // POST /login
 router.post('/login', function(req, res, next) {
   if (req.body.email && req.body.password) {
-    //this is the method we created in our model and
-    //is avaliable through the User model we required
+
     User.authenticate(req.body.email, req.body.password, function(err, user) {
       if(err || !user) {
         var error = new Error('Wrong email for password');
         error.status = 401;
         return next(error);
       } else {
-        //login successful
-        //create/add userId property to session object inside req
-        //assign it the _id of the user document
         req.session.userId = user._id;
         return res.redirect('/profile');
       }
-
-
-
-      console.log('logged in!');
     });
   } else {
     var err = new Error('Email and password required, geez...');
     err.status = 401;
     return next(err);
+  }
+});
+
+
+// GET /logout
+router.get('/logout', function(req, res, next) {
+  if (req.session) {
+    req.session.destroy(function(err) {
+      if(err) {
+        return next(err);
+      } else {
+        return res.redirect('/');
+      }
+    });
   }
 });
 
