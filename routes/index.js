@@ -15,8 +15,22 @@ router.get('/login', function(req, res, next) {
 // POST /login
 router.post('/login', function(req, res, next) {
   if (req.body.email && req.body.password) {
-    User.authenticate(req.body.email, req.body.password, function(err, result) {
-      if(err) { return next(err); }
+    //this is the method we created in our model and
+    //is avaliable through the User model we required
+    User.authenticate(req.body.email, req.body.password, function(err, user) {
+      if(err || !user) {
+        var error = new Error('Wrong email for password');
+        error.status = 401;
+        return next(error);
+      } else {
+        //login successful
+        //create/add userId property to session object inside req
+        //assign it the _id of the user document
+        req.session.userId = user._id;
+        return res.redirect('/profile');
+      }
+
+
 
       console.log('logged in!');
     });
@@ -69,6 +83,7 @@ router.post('/register', function(req, res, next) {
         if (err) {
           return (next(err));
         } else {
+          req.session.userId = user._id;
           return res.redirect('/profile');
         }
       })
