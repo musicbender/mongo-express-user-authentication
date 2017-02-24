@@ -51,6 +51,7 @@ UserSchema.statics.authenticate = function(email, password, callback) {
 //takes two arguments
 //first, the hook name. In this case 'save' which is a special mongoose keyword
 //second, a callback that can take middleware
+
 UserSchema.pre('save', function(next) {
   //this keyword refers to the user data that is to be written to mongo
   var user = this;

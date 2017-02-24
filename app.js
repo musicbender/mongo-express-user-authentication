@@ -2,20 +2,9 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var session = require('express-session');
+var MongoStore = require('connect-mongo')(session);
 
 var app = express();
-
-app.use(session({
-  secret: 'firefly',
-  resave: true,
-  saveUninitialized: false
-}));
-
-//make user ID avaliable to our tempaltes
-app.use(function(req, res, next) {
-  res.locals.currentUser = req.session.userId;
-  next();
-});
 
 //connect to database with mongoose
 mongoose.connect("mongodb://admin:gB4s55PaXe@ds011912.mlab.com:11912/treehouse-user-auth");
@@ -32,6 +21,21 @@ db.once('open', function() {
     console.log('Express app listening on port 3000');
   });
 })
+
+app.use(session({
+  secret: 'firefly',
+  resave: true,
+  saveUninitialized: false,
+  store: new MongoStore({
+    mongooseConnection: db
+  })
+}));
+
+//make user ID avaliable to our tempaltes
+app.use(function(req, res, next) {
+  res.locals.currentUser = req.session.userId;
+  next();
+});
 
 // parse incoming requests
 app.use(bodyParser.json());
