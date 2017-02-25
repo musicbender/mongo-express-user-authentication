@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var session = require('express-session');
+//this sends session data to our mongo data instead of using computer's RAM
 var MongoStore = require('connect-mongo')(session);
 
 var app = express();
